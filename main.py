@@ -7,6 +7,8 @@ import re
 from typing import List
 import logging
 import os
+import threading
+import socket
 from zipcodes import get_neighborhoods_for_zipcode
 
 # If don't want this script to send anything to telegram,
@@ -279,7 +281,19 @@ def offers_that_match_criteria(links_to_all_offers, chat_id) -> List[str]:
     return matching_offers
 
 
+def keep_port_open():
+    port = int(os.environ.get("PORT", 10000))
+    with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
+        s.bind(("", port))
+        s.listen(1)
+        while True:
+            conn, _ = s.accept()
+            conn.close()
+
+
 if __name__ == "__main__":
+    # Start dummy port server to keep Render happy
+    threading.Thread(target=keep_port_open, daemon=True).start()
 
     if TEST_MODE:
         print("Running in test mode!")
