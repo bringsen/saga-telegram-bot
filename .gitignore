@@ -2,7 +2,6 @@ requirements.in
 config.json
 .idea
 venv
-known_offers.txt
 test*
 
 __pycache__/
