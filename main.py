@@ -237,7 +237,7 @@ def get_offer_details(url: str) -> dict:
 
 
 # checks if the offer meets the criteria for this chat
-def offers_that_match_criteria(links_to_all_offers, chat_id) -> List[str]:
+def offers_that_match_criteria(links_to_all_offers, chat_id) -> list[dict]:
     matching_offers = []
     criteria = get_value_from_config(["chats", chat_id, "criteria"])
 
@@ -281,20 +281,7 @@ def offers_that_match_criteria(links_to_all_offers, chat_id) -> List[str]:
     return matching_offers
 
 
-def keep_port_open():
-    port = int(os.environ.get("PORT", 10000))
-    with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
-        s.bind(("", port))
-        s.listen(1)
-        while True:
-            conn, _ = s.accept()
-            conn.close()
-
-
 if __name__ == "__main__":
-    # Start dummy port server to keep Render happy
-    threading.Thread(target=keep_port_open, daemon=True).start()
-
     if TEST_MODE:
         print("Running in test mode!")
     if LOG_FILE:
