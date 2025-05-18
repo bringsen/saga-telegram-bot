@@ -6,6 +6,7 @@ from bs4 import BeautifulSoup
 import re
 from typing import List
 import logging
+import os
 from zipcodes import get_neighborhoods_for_zipcode
 
 # If don't want this script to send anything to telegram,
@@ -31,8 +32,11 @@ HTTP_HDRS = {
 
 
 def get_value_from_config(path: list[str]):
+    # If environment variable CONFIG_PATH is set, use that one, otherwise use config.json
+    config_path = os.getenv("CONFIG_PATH", "config.json")
+
     # gets a values from a nested object
-    with open("config.json") as file:
+    with open(config_path) as file:
         config_json = json.load(file)
         data = config_json
 
