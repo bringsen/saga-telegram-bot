@@ -51,7 +51,8 @@ def get_value_from_config(path: list[str]):
 
 def get_links_to_offers() -> dict:
     html = get_html_from_saga()
-    if html == "": return {}
+    if html is None or html == "":
+        return {}
 
     all_links = []
     soup = BeautifulSoup(html, "html.parser")
@@ -71,7 +72,7 @@ def get_links_to_offers() -> dict:
     }
 
 
-def get_html_from_saga():
+def get_html_from_saga() -> str | None:
     url = "https://www.saga.hamburg/immobiliensuche?Kategorie=APARTMENT"
     try:
         resp = requests.get(url, headers=HTTP_HDRS)
@@ -299,14 +300,18 @@ if __name__ == "__main__":
     while True:
 
         # We assume it's most likely to get updates between
-        # 7:00 and 22:00.
-        # now = datetime.now()
-        # if now.hour >= 22 or now.hour < 7:
-        #	time.sleep(600)
-        #	continue
+        # 6:00 and 23:00.
+        now = datetime.now()
+        if now.hour >= 23 or now.hour < 6:
+            time.sleep(1200)
+            continue
 
         logging.debug("Checking for updates ...")
         current_offers = get_links_to_offers()
+        # if no offers are found, try again in 3 minutes
+        if current_offers == {}:
+            time.sleep(180)
+            continue
 
         # for each chat: send offer to telegram, if it meets the chat's criteria
         for chat_id in chat_ids:
